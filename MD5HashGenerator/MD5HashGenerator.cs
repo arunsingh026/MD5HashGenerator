@@ -10,13 +10,11 @@ namespace MD5HashGenerator
     {
         private static readonly Object locker = new Object();
 
-
         static void Main(string[] args)
         {
             var Hashkey = GenerateKey("Oilytester");
             Console.WriteLine("The Hashkey is: -> " + Hashkey);
             Console.ReadLine();
-
         }
 
         /// <summary>
