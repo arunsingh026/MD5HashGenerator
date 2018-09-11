@@ -3,7 +3,12 @@ using System.Text;
 using System.Security.Cryptography;
 using System.Runtime.Serialization;
 using System.Reflection;
+using System.IO;
 
+/// <summary>
+/// Note: The file input should be in  "string 1|string 2|string 3|string 4" per line by line and after one line one space should be there if it's not, Please change the logic accordingly. 
+/// Note: Output will be "string 1|string 2|string 3|<Hash value>|string 4" i.e: "3F206BD2D4FB8B6FBEF3E79E1F6C3964".
+/// </summary>
 namespace MD5HashGenerator
 {
     public class MD5HashGenerator
@@ -12,8 +17,26 @@ namespace MD5HashGenerator
 
         static void Main(string[] args)
         {
-            var Hashkey = GenerateKey("Oilytester");
-            Console.WriteLine("The Hashkey is: -> " + Hashkey);
+            int counter = 0;
+            string line;
+
+            // Read the file and display it line by line.  
+            StreamReader file =
+                new StreamReader(@"D:\TestFiles\ReadFrom.txt");
+            while ((line = file.ReadLine()) != null)
+            {
+                // To ignore the white space in ODD numbers lines.
+                if (counter % 2 == 0)
+                {
+                    var data = line.Split("|");
+                    var hashkey = GenerateKey(data[2].ToString());
+                    Console.WriteLine("The Hashkey of {0} is -> {1}", data[2].ToString(), hashkey);
+                    // Write into file and download it.
+                    GenerateFile(data, hashkey);
+                }
+                counter++;
+            }
+            file.Close();
             Console.ReadLine();
         }
 
@@ -106,6 +129,36 @@ namespace MD5HashGenerator
                 Console.WriteLine("Hash has not been generated.");
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Add newly generated hash key into file line by line between two strings.
+        /// </summary>
+        /// <param name="data">Data representation string array.</param>
+        /// <param name="hashkey">Hash key.</param>
+        private static void GenerateFile(string[] data, string hashkey)
+        {
+            string value = "";
+            string[] result = new string[5];
+            result[0] = data[0];
+            result[1] = data[1];
+            result[2] = data[2];
+            result[3] = hashkey;
+            result[4] = data[3];
+            for (int i = 0; i < result.Length; i++)
+            {
+                if (i != 0)
+                {
+                    value = value + "|" + result[i];
+                }
+                else
+                {
+                    value = result[i];
+                }
+            }
+            TextWriter tw = File.AppendText(@"D:\TestFiles\WriteInto.txt");
+            tw.WriteLine(value);
+            tw.Close();
         }
     }
 }
